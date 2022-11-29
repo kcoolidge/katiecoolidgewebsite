@@ -1,0 +1,45 @@
+---
+title: "Katie Coolidge"
+about:
+  template: jolla
+  image: katie.JPG
+  links:
+    - icon: twitter
+      text: twitter
+      href: https://twitter.com
+    - icon: github
+      text: Github
+      href: https://github.com/kcoolidge
+    - text: LinkedIn
+      href: https://www.linkedin.com/in/katherinecoolidge/
+---
+
+\-\--
+
+Hi, I'm Katie and I'm a senior business student at the George Washington University. I am concentrating in finance with a minor in journalism and mass communication. My unique intersection of skills has opened me up to unique interests in financial markets and trends.
+
+\-\--
+
+## **Education**
+
+George Washington University
+
+## **Work Experience**
+
+WIFA
+
+GWTV
+
+Ellen Lange Skincare
+
+Evercore ISI
+
+## **Skills**
+
+Writing
+
+Public Speaking
+
+Excel
+
+Bloomberg
