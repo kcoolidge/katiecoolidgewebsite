@@ -1,5 +1,22 @@
 ---
 title: "Portfolio"
+about:
+  template: jolla
+  links:
+    - icon: Jack Carlson Revival of a Lost Culture
+      text: Jack Carlson Revival of a Lost Culture
+      href: https://issuu.com/george.gwfba/docs/george_iii
+    - icon: Astrid Voss A Rising Star
+      text: Astrid Voss A Rising Star
+      href: https://issuu.com/george.gwfba/docs/george_iii
+    - text: New Balance Unapologetically Authentic
+      href: https://issuu.com/george.gwfba/docs/george_issue_iv_pages_-3
+  
 ---
 
-Hi there this is my portfolio page
+ My Articles
+ 
+ Jack Carlson
+ 
+My first piece is an article feature on Jack Carlson, the founder of clothing company Rowing Blazers. I conducted the interview during the height of covid when the magazine's theme was to feature stories about globalization. I decided to conduct my piece on the opposite-- featuring a clothing brand striving to preserve a dynamic preppy audience.
+
