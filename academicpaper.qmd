@@ -2,12 +2,9 @@
 title: "Academic Paper"
 about:
   template: jolla
-editor: 
-  markdown: 
-    wrap: sentence
 ---
 
-Last fall I took the class Business Ethics woth Professor Vikram Bhargava for my business major.
+Last fall I took the class Business Ethics with Professor Vikram Bhargava for my business major.
 In the class I was assigned to write about a moral dilemma that had business applications and challenge myself to logically argue my position on the matter utilizing scholarly articles.
 
 I chose to write about whether it was morally permissible for pharmaceutical companies to produce human euthanasia drugs.

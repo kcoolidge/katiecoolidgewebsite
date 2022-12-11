@@ -2,9 +2,6 @@
 title: "Profile Piece"
 about:
   template: jolla
-editor: 
-  markdown: 
-    wrap: sentence
 ---
 In my intro to news writing class I wrote a piece on my close friend's mother who had an amazing career that I admired.
 
