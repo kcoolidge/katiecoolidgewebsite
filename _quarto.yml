@@ -11,6 +11,8 @@ website:
       - about.qmd
       - portfolio.qmd
       - walkthrough.qmd
+      - academicpaper.qmd 
+      - profilepiece.qmd 
   page-footer: 
     left: "Copyright 2022, Katie Coolidge" 
     right: 
