@@ -2,10 +2,10 @@
 title: "About Me"
 ---
 
-About this site
+Welcome to Katie Coolidge's website. Here I will be sharing my skills, background, resume and examples of previous work.
 
-Here is some new stuff!!
+A digital resume!
 
-```{r}
-1 + 1
-```
+So thankful for Professor Kessler at SMPA for teaching me how to code R in order to make this awesome website to showcase all my skills.
+
+

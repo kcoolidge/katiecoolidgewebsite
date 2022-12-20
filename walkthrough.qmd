@@ -1,5 +1,5 @@
 ---
-title: "Analysis Walkthrough"
+title: "Georgia Analysis Walkthrough"
 author: "Katie Coolidge"
 format:
   html:
@@ -8,7 +8,7 @@ format:
     code-tools: true
 
 ---
-We will start by loading our libraries in order to run future lines of code.
+We will start by loading our libraries in order to run future lines of code. The libraries are packages that allow the code we will write to run properly (giving the code the proper tools).
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
@@ -30,9 +30,11 @@ options(tigris_class = "sf")
 
 ```
 
-Here, I loaded my Georgia votes into my R from the excel spreadsheet by running the code below. 
-First I wanted the code to show the senate results so I pulled only the senate sheet from the excel code.
-Next I wanted the governor results so I pulled only the governor sheet.
+Here, I loaded my Georgia votes into my R from the excel spreadsheet by running the code read_excel. This prompts R to open up whatever excel file I put inside the here() which is the Georgia Votes excel sheet.  
+
+Then, I wanted to differentiate what parts of the excel file were important. First I wanted the code to show the senate results, so I pulled ONLY the senate sheet from the excel code by using sheet = "senate".
+
+Next I wanted the governor results so I pulled only the governor sheet in the same manner by using sheet = "governor" inside the read_excel function.
 
 ```{r}
 #import the GA election data for this assignment
@@ -52,31 +54,55 @@ Two columns in particular to highlight that we'll use to examine how the Republi
 
 -   **`is_r_above_trump`**. This companion columns is a so-called "flag" column, which provides a Yes/No as to whether the Republican candidate did better or worse than Trump. In other words, is the `pct_r_above_trump` value positive or negative.
 
-Next, I created a column chart that shows how many counties the Republican candidates did better vs. worse than Trump. In doing this I used ggplot to pull the senate results data then wanted the x axis to be the counties and the height of the columns to be the percent above trump of the winning candidate. I then used geomcol to create the bar chart.
+Next, I created a column chart that shows how many counties the Republican senate candidates did better vs. worse than Trump. Better meaning the value will be positive if they candidate did better and negative if they did worse.
+
+In doing this I used ggplot() to pull the senate_results data then wanted the x axis of my bar chart to be the counties so I used the label inside the dataset called "county" and the height of the columns to be the percent above trump of the winning candidate. 
+
+Then I renamed the axis using scale_y_continuous and scale_x_discrete to use more appropriate labels. Then, I added a title of the graph using labs(title =
+
+I then used geomcol() to actually create the bar chart based on the data I pulled.
 
 ```{r}
 
 ggplot(senate_results, aes(x = county, y = pct_r_above_trump)) +
-	geom_col()
+	scale_y_continuous(name = "Percent Above Trump", labels = scales::comma) +
+  scale_x_discrete(name = "County") +
+  labs(title = "Republican Senate Candidates that Did Better or Worse than Trump") +
+  geom_col()
 
 
 
 ```
 
 
-Now I made one the race for Governor with the same code as above.
+Next I made the same chart for the race for Governor with the same code as above only I switched the data to pull instead from governor_results.
 
 ```{r}
 
 ggplot(governor_results, aes(x = county, y = pct_r_above_trump)) +
-	geom_col()
+	scale_y_continuous(name = "Percent Above Trump", labels = scales::comma) +
+  scale_x_discrete(name = "County") +
+  labs(title = "Republican Governor Candidates that Did Better or Worse than Trump") +
+  geom_col()
 
 
 
 ```
 
 
-For the Senate race, I created a chart that shows the top 10 biggest drops between the Republican candidate and Trump. 
+For the Senate race, I created a chart that shows the top 10 biggest drops between the Republican candidate and Trump.
+
+First, I renamed/made a new copy of the dataset to new_senate_results as not to mess with the original called "senate_results". 
+
+Then by using arrange(desc()), I was able to order the candidates in descending order (greatest to least) to find the biggest drops between the Republican candidate and Trump.
+
+In order to just use the top 10, I needed to use the head() function and put 10 in the parenthesis to tell it I only want the first 10 of that list I made.
+
+Next, in order to make this data into a bar chart I needed to use ggplot() again. Here I inputted the dataset where this information was stored, which we said I named new_senate_results earlier. Then so that the bars are in the first quadrant and positive numbers, I needed to do something new with the x axis labeling. 
+
+Instead of the code just being aes(x = county) now it has to be aes(x = reorder(x value, -y value)) so that It flips the y values upright and makes the graph look neater. Then I entered in the typical argument for y = pct_r_above_trump so that the y axis will show how much the candidate did better or worse than Trump.
+
+Then I renamed the axis using scale_y_continuous and scale_x_discrete to use more appropriate labels. Then, I added a title of the graph using labs(title =
 
 ```{r}
 new_senate_results <- senate_results %>% 
@@ -85,7 +111,10 @@ new_senate_results <- senate_results %>%
 
 
 ggplot(new_senate_results, aes(x = reorder(county, -pct_r_above_trump), y = pct_r_above_trump)) +
-	geom_col() 
+	scale_y_continuous(name = "Percent Above Trump", labels = scales::comma) +
+  scale_x_discrete(name = "County") +
+  labs(title = "Top 10 biggest drops between the Republican Senate Candidate and Trump") +
+  geom_col() 
 
 
 
@@ -93,7 +122,17 @@ ggplot(new_senate_results, aes(x = reorder(county, -pct_r_above_trump), y = pct_
 ```
 
 
-For the Senate race, I created a chart that shows the top 10 counties highest margins of victory for the Democratic candidate. Note: in order to calulate the margin of victory you will subtract the republican results from the democrat results in 2022. 
+For the Senate race, I created a chart that shows the top 10 counties highest margins of victory for the Democratic candidate. Note: in order to calculate the margin of victory you will subtract the republican results from the democrat results in 2022. 
+
+So in order to get this new column inside the dataset, first make a new copy which I named margin_of_victory_data from the original senate_results data. Then you have to use the function mutate() in order to add a new column. Inside mutate I put (pct_d_2022 - pct_r_2022) in order to calculate the margin of victory. Once you run this line of code a new column should appear in margin_of_victory_data named MOV as I named it in the code.
+
+I then made another copy of the dataset named margin_of_victory_senate to specify that the data was for the senate. After this I arranged the margin of victory data, MOV column, in descending order by using arrange(desc).
+
+My last dataset I named top_ten_MOV which took the data we just made margin_of_victory_senate and headed it by 10 or gave me only the top 10 results. 
+
+Then I used ggplot() in the same way we used before to take my data top_ten_MOV and make it into a bar chart with geom_col(). I wanted my x axis to be counties again but needed to reorder so that the chart was positive y values, using aes(x = reorder(county, -MOV)) and then my y axis to show the data we just created from margin of victory -- MOV.
+
+Then I renamed the axis using scale_y_continuous and scale_x_discrete to use more appropriate labels. Then, I added a title of the graph using labs(title =
 
 ```{r}
 
@@ -107,6 +146,9 @@ margin_of_victory_senate <- margin_of_victory_data %>%
 top_ten_MOV <- head(margin_of_victory_senate,10)
 
 ggplot(top_ten_MOV, aes(x = reorder(county, -MOV), y = MOV)) +
+  scale_y_continuous(name = "Margin of Victory (D-R)", labels = scales::comma) +
+  scale_x_discrete(name = "County") +
+  labs(title = "D vs. R Senate Margin of Victory") +
   geom_col()
 
 
@@ -114,7 +156,7 @@ ggplot(top_ten_MOV, aes(x = reorder(county, -MOV), y = MOV)) +
 ```
 
 
-Here I did the same as the previous code but for the race for governor. 
+Here, I did the same as the previous lines of code but for the race for governor. 
 
 ```{r}
 margin_of_victory_data_2 <- governor_results %>% 
@@ -126,6 +168,9 @@ margin_of_victory_governor <- margin_of_victory_data_2 %>%
 top_ten_MOV_gov <- head(margin_of_victory_governor,10)
 
 ggplot(top_ten_MOV_gov, aes(x = reorder(county, -MOV_governor), y = MOV_governor)) +
+  scale_y_continuous(name = "Margin of Victory (D-R)", labels = scales::comma) +
+  scale_x_discrete(name = "County") +
+  labs(title = "D vs. R Governor Margin of Victory") +
   geom_col()
 
 
@@ -143,6 +188,8 @@ counties_geo <- tigris::counties(state = "GA", resolution = "20m", cb = TRUE)
 
 Now let's take a look at what we have, by mapping out the polygons of the Georgia counties using the tmap package.
 
+First, I used tm_shape to get all of the counties shapes loaded into my R for Georgia. Then I used tm_polygons in order to put the counties into a graphical representation as seen below.
+
 ```{r}
 
 tm_shape(counties_geo) + 
@@ -152,6 +199,10 @@ tm_shape(counties_geo) +
 ```
 
 For the Senate race, I created a choropleth (shaded) map of Georgia counties that shows where the Republican candidate for Senate did better vs. worse than Trump.
+
+I did this by joining my geographical county data "counties_geo" and the "senate_results" by joining the two by GEOID and fipscode to create a new dataset which I called senatemap. 
+
+Then I used tm_shape to create a chloropleth map by pulling from the data I just created, senatemap. Then I used tm_poygons to say that I wanted to take data from the "is_r_above_trump" column to show one color if they did better and another if they did worse than Trump and then link that with the GEOID so that it can create the geographical chart.
 
 ```{r}
 senatemap <- inner_join(counties_geo, senate_results, by = c("GEOID" = "fipsCode"))
@@ -167,7 +218,7 @@ tm_shape(senatemap) +
 ```
 
 
-Now I've done the same as above but for the governor race.
+Now I've done the same as above, but for the GOVERNOR race.
 
 ```{r}
 
@@ -182,7 +233,11 @@ tm_shape(govmap) +
 
 ```
 
-For the Senate race, I created a choropleth map that shows the margins of victory for the Democratic candidate. To do that I needed to compare the Democratic candidate's percentage (pct_d\_2022) with the Republican's (pct_r\_2022) to calculate the margin of victory for each county.
+For the Senate race, I created a choropleth map that shows the margins of victory for the Democratic candidate. 
+
+To do that I needed to compare the Democratic candidate's percentage (pct_d\_2022) with the Republican's (pct_r\_2022) to calculate the margin of victory for each county.Good thing this column of data already exists under my dataset named margin_of_victory_senate, which I used to inner join with counties_geo by fipscode. 
+
+This created a new dataset I named MOVsenmap. From here I wanted to take MOVsenmap and actually make a map using that column MOV. To do this I did tm_shape and used MOVsenmap data, then used tm_polygons to use the MOV column I created in the data with the grographical location GEOID to create the map.
 
 ```{r}
 MOVsenmap <- inner_join(counties_geo, margin_of_victory_senate, by = c("GEOID" = "fipsCode"))
@@ -197,7 +252,7 @@ tm_shape(MOVsenmap) +
 
 ```
 
-Now I did the same as above but this time for the governor race.
+Now I did the same as above, but this time for the GOVERNOR race.
 
 ```{r}
 

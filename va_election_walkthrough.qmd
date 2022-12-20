@@ -1,0 +1,196 @@
+---
+title: "Virginia Election Code Walkthrough"
+author: "Katie Coolidge"
+execute:
+  echo: true
+format:
+  html:
+    self-contained: true
+    code-tools: true
+---
+1 Intro: Here I will be using Virginia election data from the race between Biden and Trump but also the race for Governor between Terry McAuliffe and Glenn Youngkin. 
+
+We will use the data throughout this walkthrough to show several comparisons between candidates of each race.
+
+Now we will run the appropriate libraries in order to run future lines of code:
+
+```{r setup, include=FALSE, warning=FALSE, message=FALSE}
+
+
+library(tidyverse)
+library(janitor)
+library(httr)
+library(jsonlite)
+library(kableExtra)
+library(here)
+library(DT)
+options(scipen = 999)
+options(stringsAsFactors = FALSE)
+
+
+#load saved joined data file from previous script
+joined_vacomparison <- readRDS(here("processed_data", "joined_vacomparison.rds"))
+
+
+
+```
+
+
+2. Here we will be making a broad datatable from the election information so that you can search through and play with the different arguments. 
+
+First I took my dataset with all the information, joined_vacomparison and made a searchable data table by using DT::datatable function and making sure I put in a filter argument = "top" to let a viewer search by the top labels.
+
+```{r}
+joined_vacomparison %>% 
+  DT::datatable(rownames = FALSE, filter = "top",
+                options = list(searching = FALSE, paging = FALSE, dom = "tip")) 
+
+
+```
+
+
+3 & 4: Ultimately, this code will show us a chart of the top 5 counties with the highest differences between Youngkin and Trump percentages. 
+
+To do this, first I had to make a new column to calculate the difference between the percentage of the Youngkin vote and Trump vote by using mutate(), picking a name for the column, Rgov_to_pres and giving them the calculation, pct_youngkin - trump_pct. Then I arranged this data in descending order (greatest to least).
+
+Now, I only want the top 5. I made a new dataset called top_5_counties_youngkin_v_trump to cut off my original dataset Rgov_to_pres_joined_vacomparison to only 5 values by using head().
+
+Then to create the chart I used ggplot() and picked the new data set I created of just the top 5 counties, top_5_counties_youngkin_v_trump and made sure to reorder my input so that the y values would be in the first quadrant and not negative numbers. I wanted x=locality and y = the values from the new column we made calculating the difference in percent between youngkin and trump. Therefore, x = reorder(locality, -Rgov_to_pres, y = Rgov_to_pres).
+
+I then flipped the coordinates so that all of the county names show up clearly and non-overlapped with coord_flip(). Then I renamed the axis using scale_y_continuous and scale_x_discrete to use more appropriate labels. Then, I added a title of the graph using labs(title =
+
+Then I used geom(col) to make the bar chart to show it.
+
+
+```{r}
+Rgov_to_pres_joined_vacomparison <- joined_vacomparison %>% 
+mutate(Rgov_to_pres = pct_youngkin - trump_pct) %>% 
+  arrange(desc(Rgov_to_pres))
+
+top_5_counties_youngkin_v_trump <- head(Rgov_to_pres_joined_vacomparison,5)
+
+ggplot(top_5_counties_youngkin_v_trump, aes(x = reorder(locality, -Rgov_to_pres), y = Rgov_to_pres)) +
+  coord_flip() +
+	scale_y_continuous(name = "Youngkin Performance Against Trump", labels = scales::comma) +
+  scale_x_discrete(name = "County") +
+  labs(title = "Top 5 Counties with Biggest Difference Between Youngkin & Trump") +
+  geom_col() 
+
+
+```
+
+5. Here I wanted to create a chart that shows the top 5 counties where Youngkin got the highest percentage of the vote.
+
+To do this first I made a new dataset named top_5_youngkin_counties by only including the two columns I needed -- locality and the percent of youngkins vote select(locality, pct_youngkin). Then, I arranged these values in descending order with arrange(desc()) and only took the top 5 by using head(5).
+
+In order to make a bar chart of the top 5 results I had to use ggplot() to select the new dataset, top_5_youngkin_counties. I needed to reorder the x so that my y values would show up cleanly so I used locality for my x value and the percent of youngkin votes as the y "pct_youngkin". 
+
+I then flipped the coordinates so that all of the county names show up clearly and non-overlapped with coord_flip(). Then I renamed the axis using scale_y_continuous and scale_x_discrete to use more appropriate labels. Then, I added a title of the graph using labs(title =
+
+Then, I used geom_col() to make the bar chart of the data.
+
+```{r}
+top_5_youngkin_counties <- joined_vacomparison %>% 
+  select(locality, pct_youngkin) %>%
+   arrange(desc(pct_youngkin)) %>% 
+  head(5)
+
+ggplot(top_5_youngkin_counties, aes(x = reorder(locality, -pct_youngkin), y = pct_youngkin)) +
+	coord_flip() +
+  scale_y_continuous(name = "Percent Vote Youngkin", labels = scales::comma) +
+  scale_x_discrete(name = "County") +
+  labs(title = "Top 5 Youngkin Counties Votes") +
+  geom_col() 
+
+```
+
+6. Here I wanted to create a TABLE that shows the top 5 counties where McAuliffe got the highest percent of the vote.
+
+To do this first I made a new dataset names top_5_mcauliffe_counties from my original dataset joined_vacomparison. In the new dataset I selected only the two fields I needed which where locality and pct_mcauliffe. Then I arranged them in descending order by using arrange(desc(pct_mcauliffe)) and head(5) to only take the top 5.
+
+From here I made my table using DT:: datatable and inputted the dataset I wanted to make a table which was top_5_mcauliffe_counties.
+
+```{r}
+top_5_mcauliffe_counties <- joined_vacomparison %>% 
+  select(locality, pct_mcauliffe) %>%
+   arrange(desc(pct_mcauliffe)) %>% 
+  head(5)
+
+DT::datatable(top_5_mcauliffe_counties)
+
+```
+
+7. In this segment I wanted to compare the 2 candidates for governor. 
+
+First, I had to add a new column to joined_vacomparison to compare the percent vote of youngkin to mcauliffe. I did this by using the function mutate() and giving them the equation to find the difference = pct_youngkin - pct_mcauliffe. 
+
+Then I renamed the dataset to be more specific to gov_r_win_joined_vacomparison and arranged the new column that I created (gov_r_win) in descending order using arrange(desc(govr_r_win)). Then I only wanted the top 10 so I headed it, head(10). 
+
+In order to create the chart of this I used ggplot() and selected the dataset I needed -- gov_r_win_joined_vacomparison, and then told ggplot what would be in my x and y axis, x = locality and y = gov_r_win. In order to format it nicely I used reorder to make sure my y values were in the first quadrant. 
+
+I then flipped the coordinates so that all of the county names show up clearly and non-overlapped with coord_flip(). Then I renamed the axis using scale_y_continuous and scale_x_discrete to use more appropriate labels. Then, I added a title of the graph using labs(title =
+
+Then I used geom(col) to make the actual chart.
+
+```{r}
+
+#compares governor race R to D
+
+joined_vacomparison <- joined_vacomparison %>% 
+mutate(gov_r_win = pct_youngkin - pct_mcauliffe)
+
+gov_r_win_joined_vacomparison <- joined_vacomparison %>% 
+  arrange(desc(gov_r_win)) %>%
+  head(10) 
+
+
+ggplot(gov_r_win_joined_vacomparison, aes(x = reorder(locality, -gov_r_win), y = gov_r_win)) +
+	coord_flip() +
+  scale_y_continuous(name = "Youngkin Outperformance to McAuliffe", labels = scales::comma) +
+  scale_x_discrete(name = "County") +
+  labs(title = "Race for Governor Comparison") +
+  geom_col() 
+
+```
+8. Here I wanted to compare the two democrat candidates for governor and presidency and see if the governor got more or less percent vote than the president did. 
+
+First I made a new column -- d_gov_to_pres in order to show the difference between mcauliffe and biden by using mutate(pct_mcauliffe - biden_pct).
+
+Then I named the dataset d_gov_to_pres_joined_vacomparison in order to arrange the values in descending order using arrange(desc(new column I made)). I only needed the locality field and the difference in pctent votes so I selected only those two fields. Then I only wanted the top 10 so I headed it at 10.
+
+I made a datatable of my results by usinf the datatable function and putting in the dataset the information would come from -- d_gov_to_pres_joined_vacomparison.
+
+```{r}
+joined_vacomparison <- joined_vacomparison %>% 
+mutate(d_gov_to_pres = pct_mcauliffe - biden_pct)
+
+d_gov_to_pres_joined_vacomparison <- joined_vacomparison %>% 
+  arrange(desc(d_gov_to_pres)) %>%
+  select(locality, d_gov_to_pres) %>% 
+  head(10) 
+
+
+DT::datatable(d_gov_to_pres_joined_vacomparison)
+
+```
+9. Lastly, I wanted a table that would show the top 5 counties that voted for Trump/ where Trump got the highest percentage of the vote. 
+
+To do this I made a new datatable named top_5_trump_counties from the original dataset. Then I selected only the fields I wanted which were the location -- locality and the trump percent of votes -- trump_pct. I then put them in descending order with arrange(desc(trump_pct)) and only took the top 5 by using head(5). 
+
+To make the table I just used the name of the dataset, used a pipe --> %>%  and attached the datatable function.
+
+```{r}
+ 
+top_5_trump_counties <- joined_vacomparison %>% 
+  select(locality, trump_pct) %>%
+   arrange(desc(trump_pct)) %>% 
+  head(5)
+
+top_5_trump_counties %>% 
+  DT::datatable(rownames = FALSE, filter = "top",
+                options = list(searching = FALSE, paging = FALSE, dom = "tip")) 
+
+
+```
+
+
