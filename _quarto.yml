@@ -12,8 +12,8 @@ website:
         text: Resume
       - about.qmd
       - portfolio.qmd
-      - walkthrough.qmd
       - va_election_walkthrough.qmd
+      - walkthrough.qmd
       - academicpaper.qmd 
       - profilepiece.qmd 
   page-footer: 
